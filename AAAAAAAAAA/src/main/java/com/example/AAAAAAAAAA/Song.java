@@ -16,7 +16,6 @@ public class Song extends MusicItem {
         this.genre = genre;
     }
 
-    // Геттеры и сеттеры (ОБЯЗАТЕЛЬНО для JSON)
     public String getArtist() { return artist; }
     public void setArtist(String artist) { this.artist = artist; }
 
