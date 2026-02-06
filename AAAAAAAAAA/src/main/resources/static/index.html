@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Music Library CRUD</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 30px; background-color: #f8f9fa; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .form-group { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; }
+        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; transition: 0.3s; }
+        .btn-add { background-color: #28a745; color: white; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2> Music Library </h2>
+
+    <div class="form-group">
+        <input type="text" id="title" placeholder="Title">
+        <input type="text" id="artist" placeholder="Artist">
+        <input type="number" id="duration" placeholder="Sec">
+        <input type="text" id="genre" placeholder="Genre">
+        <button class="btn-add" onclick="addSong()">Add Song</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Title</th><th>Artist</th><th>Duration</th><th>Genre</th><th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="song-table-body"></tbody>
+    </table>
+</div>
+
+<script>
+    const API_URL = '/api/songs';
+
+    function loadSongs() {
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(songs => {
+                const tbody = document.getElementById('song-table-body');
+                tbody.innerHTML = '';
+                songs.forEach(song => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${song.title}</td>
+                            <td>${song.artist}</td>
+                            <td>${song.duration}</td>
+                            <td>${song.genre}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteSong('${song.title}')">Delete</button>
+                            </td>
+                        </tr>`;
+                });
+            });
+    }
+
+    function addSong() {
+        const song = {
+            title: document.getElementById('title').value,
+            artist: document.getElementById('artist').value,
+            duration: document.getElementById('duration').value,
+            genre: document.getElementById('genre').value
+        };
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(song)
+        }).then(() => {
+            loadSongs(); // Обновляем таблицу
+            clearInputs();
+        });
+    }
+
+    function deleteSong(title) {
+        fetch(`${API_URL}/${title}`, { method: 'DELETE' })
+            .then(() => loadSongs());
+    }
+
+    function clearInputs() {
+        document.querySelectorAll('input').forEach(i => i.value = '');
+    }
+
+    loadSongs();
+</script>
+
+</body>
+</html>
